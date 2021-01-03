@@ -1,7 +1,7 @@
-#!/usr/bin/env python3
+#!/usr/bin/python3
 
-#This scrip uses dmenu or rofi to fetch windows in the i3 sratch pad and presents
-#a menu to select one and brinf it to the front
+# This scrip uses dmenu or rofi to fetch windows in the i3 sratch pad and presents
+# a menu to select one and brinf it to the front
 
 # Author, current maintainer: Philippe Charest <philippe.charest@gmail.com>
 
@@ -22,9 +22,10 @@
 
 import i3ipc
 import os
-#Select which executable you want to use
-MENUEXEC="rofi -dmenu"
-#MENUEXEC="dmenu"
+
+# Select which executable you want to use
+MENUEXEC = "rofi -dmenu"
+# MENUEXEC="dmenu"
 if __name__ == "__main__":
     i3 = i3ipc.Connection()
     tree = i3.get_tree()
@@ -38,8 +39,13 @@ if __name__ == "__main__":
         count += 1
     winMenuString = winMenuString[:-1]  # Remvoe the extra \n
     winMenuString += '"'
+    print(winMenuString)
     commandString = (
-        "echo " + winMenuString + '| ' + MENUEXEC+  ' -p "Select Scratchpad window to open"'
+        "echo "
+        + winMenuString
+        + "| "
+        + MENUEXEC
+        + ' -p "Select Scratchpad window to open"'
     )
     menuout = os.popen(commandString, "r").read()
     menuout = menuout[:-1]  # For some reason read returns an extra \n
@@ -47,4 +53,3 @@ if __name__ == "__main__":
         print("No window selected")
     else:
         winDict[menuout].command("focus")  # command to close all windows
-
