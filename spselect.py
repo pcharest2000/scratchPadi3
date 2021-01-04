@@ -22,34 +22,73 @@
 
 import i3ipc
 import os
+import argparse
 
 # Select which executable you want to use
 MENUEXEC = "rofi -dmenu"
 # MENUEXEC="dmenu"
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "--select",
+        action="count",
+        help="Shows a dmenu/rofi menu to select a window in the scratchpad ",
+    )
+    parser.add_argument(
+        "--showall", action="count", help="Show all windows from the scratchpad"
+    )
+    parser.add_argument(
+        "--hideall",
+        action="count",
+        help="Put back all scratcpad window to the scratchpad",
+    )
+    args = parser.parse_args()
     i3 = i3ipc.Connection()
     tree = i3.get_tree()
-    scWindows = tree.scratchpad().leaves()
-    winMenuString = '"'
-    winDict = {}
-    count = 0  # Used to enumarate windows with same title
-    for win in scWindows:
-        winDict[str(count) + ": " + win.name] = win
-        winMenuString += str(count) + ": " + win.name + "\n"
-        count += 1
-    winMenuString = winMenuString[:-1]  # Remvoe the extra \n
-    winMenuString += '"'
-    print(winMenuString)
-    commandString = (
-        "echo "
-        + winMenuString
-        + "| "
-        + MENUEXEC
-        + ' -p "Select Scratchpad window to open"'
-    )
-    menuout = os.popen(commandString, "r").read()
-    menuout = menuout[:-1]  # For some reason read returns an extra \n
-    if menuout == "":
-        print("No window selected")
-    else:
-        winDict[menuout].command("focus")  # command to close all windows
+
+    if args.select:
+        scWindows = tree.scratchpad().leaves()
+        # if no window on scratchpad exit
+        if len(scWindows)==0:
+            quit()
+        winDict = {}
+        winMenuString = '"'
+        count = 0  # Used to enumarate windows with same title
+        for win in scWindows:
+            winDict[str(count) + ": " + win.name] = win
+            winMenuString += str(count) + ": " + win.name + "\n"
+            count += 1
+        winMenuString = winMenuString[:-1]  # Remvoe the extra \n
+        winMenuString += '"'
+        print(winMenuString)
+        commandString = (
+            "echo "
+            + winMenuString
+            + "| "
+            + MENUEXEC
+            + ' -p "Select Scratchpad window to open"'
+        )
+        menuout = os.popen(commandString, "r").read()
+        menuout = menuout[:-1]  # For some reason read returns an extra \n
+        if menuout == "":
+            print("No window selected")
+        else:
+            winDict[menuout].command("focus")  # command to close all windows
+
+    elif args.hideall:
+        leaves = tree.leaves()
+        # find leaves that have a scratch pas status
+        # print(leaves[0].ipc_data)
+        for win in leaves:
+            if(win.parent.scratchpad_state!="none"):
+                win.command('move scratchpad')
+
+    elif args.showall:
+        scWindows = tree.scratchpad().leaves()
+        if len(scWindows)==0:
+            quit()
+        # find leaves that have a scratch pas status
+        # print(leaves[0].ipc_data)
+        for win in scWindows:
+            win.command("focus")
+            # win.command("move 0 0")
