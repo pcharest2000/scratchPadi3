@@ -10,13 +10,16 @@ Python script to managei i3 scratchpad winddows
 -pip  install i3ipc  
 -git clone https://github.com/pcharest2000/scratchPadi3.git  
 -cd scratchPadi3  
--chmod + x spselect.py  
-Copy the scrip somewhere in your path.  
+-With your favorite editor Modify the script variable MENUEXEC to choose between rofi or dmenu  
+-Make the script executable: chmod + x spselect.py  
+-Copy the script somewhere in your path:  
+  cp spselect.py ~/.local/bin  
 
-Bind them in your i3 config file:  
+Bind the script in your i3 config file with the proper argument:  
 bindsym $mod+Ctrl+s  exec "${HOME}/.local/bin/spselect --select"  
 
 # Usage
+<pre>
 usage: spselect.py [-h] [--select] [--showall] [--hideall]  
 
 optional arguments:  
@@ -25,5 +28,5 @@ optional arguments:
               scratchpad  
   --showall   Show all windows from the scratchpad  
   --hideall   Put back all scratcpad window to the scratchpad  
-
+</pre>
 
